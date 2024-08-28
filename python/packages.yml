@@ -1,0 +1,10 @@
+name: mynotebooks
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - opencv
+  - pip:
+    - -r requirements.txt

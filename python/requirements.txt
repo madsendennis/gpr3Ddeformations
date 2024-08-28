@@ -1,0 +1,32 @@
+# Core Libraries
+argparse
+numpy
+tqdm
+
+# Interactive Development
+jupyterlab
+notebook
+ipywidgets
+ipympl
+
+# Machine Learning
+scikit-learn
+
+# Deep Learning
+torch
+pytorch-lightning
+torchvision
+torchaudio
+
+# Gaussian Processes
+gpytorch
+
+# Visualization
+tensorboard
+torch-tb-profiler
+matplotlib
+seaborn
+
+# Testing
+pytest
+ipytest

@@ -14,4 +14,17 @@ This will open Scalismo-UI and show the following:
 In the image we see that the output of 3 different posterior computations each conditioned on 2 deformations. One deformation in the corner with a noise set to 1.0 and another point in the center with a different uncertainty over the 3 different runs: 1.0, 2.0 and 5.0. 
 
 ## Python
+Install [miniconda](https://docs.anaconda.com/miniconda/)
+
+CD into the python directory.
+
+Set up the python environment:
+```
+conda env create --file packages.yml
+```
+Start the jupyter server
+```
+conda activate mynotebooks
+jupyter notebook
+```
 

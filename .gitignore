@@ -1,0 +1,30 @@
+# Scala
+*.class
+*.log
+*.metals
+.bloop/
+.scala-build/
+target/
+scala-cli.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+*.ipynb
+
+# Miniconda
+/miniconda3/
+/envs/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
