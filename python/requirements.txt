@@ -2,6 +2,8 @@
 argparse
 numpy
 tqdm
+pre-commit 
+nbqa
 
 # Interactive Development
 jupyterlab
