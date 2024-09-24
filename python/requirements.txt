@@ -5,6 +5,8 @@ tqdm
 pre-commit 
 nbqa
 
+h5json
+
 # Interactive Development
 jupyterlab
 notebook
@@ -32,3 +34,6 @@ seaborn
 # Testing
 pytest
 ipytest
+
+# Mesh
+pyrender # also installs: trimesh, pyglet, PyOpenGL, imageio
