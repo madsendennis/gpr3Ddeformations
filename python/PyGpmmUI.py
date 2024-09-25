@@ -59,9 +59,12 @@ class PyGpmmUI:
         def set_zero_values(_):
             self._empty_and_add_to_queue((name, np.zeros(rank)))
 
+        def enable_slider_observation():
+            for slider in sliders:
+                slider.observe(queue_update, names="value")
+
         # Connect UI elements to functions
-        for slider in sliders:
-            slider.observe(queue_update, names="value")
+        # enable_slider_observation()
         random_button.on_click(set_random_values)
         zero_button.on_click(set_zero_values)
 
@@ -72,6 +75,8 @@ class PyGpmmUI:
             "random_button": random_button,
             "zero_button": zero_button,
             "material": material,
+            "z": initial_z,
+            "rank": rank,
         }
 
         # Create and display control panel
@@ -97,20 +102,35 @@ class PyGpmmUI:
     def _update_mesh_worker(self):
         while True:
             try:
-                name, z = self.update_queue.get(timeout=1.0)
+                name, z = self.update_queue.get(timeout=0.1)
                 if name in self.gpmm_controls:
                     controls = self.gpmm_controls[name]
-                    self._update_sliders(controls["sliders"], z)
+                    sliders = controls["sliders"]
+                    self._update_sliders(sliders, z)
                     self._update_scene(name, controls["gpmm"], z, controls["material"])
+                    self.gpmm_controls[name]["z"] = z
             except queue.Empty:
-                time.sleep(0.1)
+                to_sleep = True
+                for name in self.gpmm_controls:
+                    sliders = self.gpmm_controls[name]["sliders"]
+                    rank = self.gpmm_controls[name]["rank"]
+                    z = self.gpmm_controls[name]["z"]
+                    slider_values = np.zeros(rank)
+                    for i, slider in enumerate(sliders):
+                        slider_values[i] = slider.value
+                    if not np.array_equal(slider_values, z):
+                        self._empty_and_add_to_queue((name, slider_values))
+                        to_sleep = False
+                if to_sleep:
+                    time.sleep(0.1)
             except Exception as e:
                 print(f"Error in update_mesh_worker: {e}")
 
     def _update_sliders(self, sliders, z):
         for i, slider in enumerate(sliders):
             if i < len(z):
-                slider.value = z[i]
+                if slider.value != z[i]:
+                    slider.value = z[i]
 
     def _update_scene(self, name: str, gpmm: GPMM, z: np.ndarray, material: Material):
         mesh_tri = self._create_mesh(gpmm, z)

@@ -1,17 +1,18 @@
+from abc import ABC, abstractmethod
 from trimesh import Trimesh
 from vectorization import vectorize, unvectorize
 import numpy as np
 import h5py
 
 
-class GPMM:
+class GPMM(ABC):
     def __init__(
         self,
-        reference_points: np.ndarray,
-        reference_cells: np.ndarray,
-        model_mean_deformation: np.ndarray,
-        model_basis: np.ndarray,
-        model_variance: np.ndarray,
+        reference_points,
+        reference_cells,
+        model_mean_deformation,
+        model_basis,
+        model_variance,
     ):
         self.reference_points = reference_points
         self.reference_cells = reference_cells
@@ -20,6 +21,40 @@ class GPMM:
         self.model_variance = model_variance
         self.rank: int = len(self.model_variance)
         self.dim: int = len(self.reference_points[0])
+
+    @abstractmethod
+    def mean(self) -> Trimesh:
+        pass
+
+    @abstractmethod
+    def sample(self, scaling: float = 1.0) -> Trimesh:
+        pass
+
+    @abstractmethod
+    def instance(self, c) -> Trimesh:
+        pass
+
+    def _to_trimesh(self, deformation):
+        points = self.reference_points + unvectorize(deformation, self.dim)
+        return Trimesh(vertices=points, faces=self.reference_cells)
+
+
+class GpmmClassic(GPMM):
+    def __init__(
+        self,
+        reference_points,
+        reference_cells,
+        model_mean_deformation,
+        model_basis,
+        model_variance,
+    ):
+        super().__init__(
+            reference_points,
+            reference_cells,
+            model_mean_deformation,
+            model_basis,
+            model_variance,
+        )
 
     def mean(self) -> Trimesh:
         c = np.zeros(self.rank)
@@ -56,12 +91,8 @@ class GPMM:
     #     # update gpmm with new decimated reference
     #     pass
 
-    def _to_trimesh(self, deformation):
-        points = self.reference_points + unvectorize(deformation, self.dim)
-        return Trimesh(vertices=points, faces=self.reference_cells)
 
-
-def gpmm_from_h5(file: str) -> GPMM:
+def gpmm_from_h5(file: str) -> GpmmClassic:
     with h5py.File(file, "r") as file:
         reference_points = np.array(file["representer"]["points"]).T
         reference_points_vec = vectorize(reference_points)
@@ -71,7 +102,7 @@ def gpmm_from_h5(file: str) -> GPMM:
         model_variance = np.array(file["model"]["pcaVariance"])
     model_mean_deformation = model_mean - reference_points_vec
 
-    return GPMM(
+    return GpmmClassic(
         reference_points,
         reference_cells,
         model_mean_deformation,
